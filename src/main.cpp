@@ -4001,7 +4001,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     // checks that use witness data may be performed here.
 
     // Size limits
-    if (block.vtx.empty() || block.vtx.size() > MAX_BLOCK_BASE_SIZE || ::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION) > MAX_BLOCK_BASE_SIZE)
+    if (block.vtx.empty() || block.vtx.size() > MAX_BLOCK_BASE_SIZE || ::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) > MAX_BLOCK_BASE_SIZE)
         return state.DoS(100, error("%s: size limits failed", __func__),
             REJECT_INVALID, "bad-blk-length");
 
@@ -5729,8 +5729,8 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                         // wait for other stuff first.
                         vector<CInv> vInv;
                         vInv.push_back(CInv(MSG_BLOCK, chainActive.Tip()->GetBlockHash()));
-                        pfrom->PushMessage("inv", vInv); //TODO: push message with flag NO_WITNESS
-                        pfrom->hashContinue = 0;
+                        pfrom->PushMessage(NetMsgType::INV, vInv);
+                        pfrom->hashContinue.SetNull();
                     }
                 }
             } else if (inv.type == MSG_TX || inv.type == MSG_WITNESS_TX) {
@@ -5740,7 +5740,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                     LOCK(cs_mapRelay);
                     map<CInv, CDataStream>::iterator mi = mapRelay.find(inv);
                     if (mi != mapRelay.end()) {
-                        pfrom->PushMessage(inv.GetCommand(), (*mi).second); //TODO: push message with flags
+                        pfrom->PushMessageWithFlag(inv.type == MSG_TX ? SERIALIZE_TRANSACTION_NO_WITNESS : 0, NetMsgType::TX, (*mi).second);
                         pushed = true;
                     }
                 }
