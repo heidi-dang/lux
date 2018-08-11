@@ -65,7 +65,8 @@ static const bool DEFAULT_SPEND_ZEROCONF_CHANGE = true;
 static const bool DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN = true;
 
 static const bool DEFAULT_NOT_USE_CHANGE_ADDRESS = false;
-extern const char * DEFAULT_WALLET_DAT;
+//! if set, all keys will be derived by using BIP32
+static const bool DEFAULT_USE_HD_WALLET = true;
 
 class CAccountingEntry;
 class CCoinControl;
@@ -322,6 +323,9 @@ public:
     bool SelectCoinsCollateral(std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet) const;
 
     void LoadKeyPool(int64_t nIndex, const CKeyPool &keypool);
+
+    /* the hd chain data model (external chain counters) */
+    CHDChain hdChain;
 
     /*
      * Main wallet lock.
@@ -797,8 +801,17 @@ public:
      */
     CTxDestination AddAndGetDestinationForScript(const CScript& script, OutputType);
 
+<<<<<<< HEAD
     /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
     bool AbandonTransaction(const uint256& hashTx);
+=======
+    /* Set the hd chain model (chain child index counters) */
+    bool SetHDChain(const CHDChain& chain, bool memonly);
+
+    /* Set the current hd master key (will reset the chain child index counters) */
+    bool SetHDMasterKey(const CKey& key);
+
+>>>>>>> f18fa79b... HDChain - Add simplest BIP32/deterministic key generation
 };
 
 /** A key allocated from the key pool. */
