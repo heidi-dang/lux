@@ -58,12 +58,6 @@ bool PaymentRequestPlus::IsInitialized() const
     return paymentRequest.IsInitialized();
 }
 
-QString PaymentRequestPlus::getPKIType() const
-{
-    if (!IsInitialized()) return QString("none");
-    return QString::fromStdString(paymentRequest.pki_type());
-}
-
 bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) const
 {
     merchant.clear();
@@ -149,7 +143,7 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
             int error = X509_STORE_CTX_get_error(store_ctx);
             // For testing payment requests, we allow self signed root certs!
             // This option is just shown in the UI options, if -help-debug is enabled.
-            if (!(error == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT && GetBoolArg("-allowselfsignedrootcertificates", DEFAULT_SELFSIGNED_ROOTCERTS))) {
+            if (!(error == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT && GetBoolArg("-allowselfsignedrootcertificates", false))) {
                 throw SSLVerifyError(X509_verify_cert_error_string(error));
             } else {
                qDebug() << "PaymentRequestPlus::getMerchant: Allowing self signed root certificate, because -allowselfsignedrootcertificates is true.";
@@ -193,7 +187,8 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
             throw SSLVerifyError("Bad certificate, missing common name.");
         }
         // TODO: detect EV certificates and set merchant = business name instead of unfriendly NID_commonName ?
-    } catch (SSLVerifyError& err) {
+    }
+    catch (const SSLVerifyError& err) {
         fResult = false;
         qWarning() << "PaymentRequestPlus::getMerchant : SSL error: " << err.what();
     }
