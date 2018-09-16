@@ -74,26 +74,6 @@ const static std::string allNetMessageTypes[] = {
     NetMsgType::BLOCKTXN,
 };
 
-static const char* ppszTypeName[] =
-        {
-                "ERROR",
-                "tx",
-                "block",
-                "filtered block",
-                "tx lock request",
-                "tx lock vote",
-                "spork",
-                "mn winner",
-                "mn scan error",
-                "mn budget vote",
-                "mn budget proposal",
-                "mn budget finalized",
-                "mn budget finalized vote",
-                "mn quorum",
-                "mn announce",
-                "mn ping",
-                "dstx"
-        };
 const static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
 
 CMessageHeader::CMessageHeader()
@@ -181,19 +161,6 @@ bool operator<(const CInv& a, const CInv& b)
 
 std::string CInv::GetCommand() const
 {
-<<<<<<< HEAD
-    return (type >= 1 && type < (int)ARRAYLEN(ppszTypeName));
-}
-
-const char* CInv::GetCommand() const
-{
-    if (!IsKnownType()) {
-        LogPrint("net", "CInv::GetCommand() : type=%d unknown type", type);
-        return ppszTypeName[0]; // ERROR
-    }
-
-    return ppszTypeName[type];
-=======
     std::string cmd;
     if (type & MSG_WITNESS_FLAG)
         cmd.append("witness-");
@@ -206,7 +173,6 @@ const char* CInv::GetCommand() const
         default:
             throw std::out_of_range(strprintf("CInv::GetCommand(): type=%d unknown type", type));
     }
->>>>>>> ee765d22... HDChain - Update allNetMessageTypes
 }
 
 std::string CInv::ToString() const

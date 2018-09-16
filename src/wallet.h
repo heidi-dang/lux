@@ -801,17 +801,14 @@ public:
      */
     CTxDestination AddAndGetDestinationForScript(const CScript& script, OutputType);
 
-<<<<<<< HEAD
     /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
     bool AbandonTransaction(const uint256& hashTx);
-=======
     /* Set the hd chain model (chain child index counters) */
     bool SetHDChain(const CHDChain& chain, bool memonly);
 
     /* Set the current hd master key (will reset the chain child index counters) */
     bool SetHDMasterKey(const CKey& key);
 
->>>>>>> f18fa79b... HDChain - Add simplest BIP32/deterministic key generation
 };
 
 /** A key allocated from the key pool. */
